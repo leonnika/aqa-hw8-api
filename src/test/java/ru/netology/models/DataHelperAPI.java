@@ -30,6 +30,14 @@ public class DataHelperAPI {
         return new UserCode (login,code);
    }
 
+   public static int getCurrentBalance (String cardNumber) throws SQLException {
+       val runner = new QueryRunner();
+       val conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/app", "app", "pass");
+       val dataSQLId="SELECT balance_in_kopecks FROM cards WHERE number =?";
+       int balance =runner.query(conn, dataSQLId, new ScalarHandler<>(),cardNumber);;
+       return balance;
+    }
+
     public static Transfer getTransferAPI(){
         String fromCard="5559 0000 0000 0002";
         String toCard="5559 0000 0000 0008";

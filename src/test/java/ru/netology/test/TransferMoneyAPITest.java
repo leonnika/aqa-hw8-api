@@ -3,14 +3,18 @@ package ru.netology.test;
 
 import lombok.val;
 import org.apache.commons.dbutils.QueryRunner;
+import org.apache.commons.dbutils.handlers.ScalarHandler;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import ru.netology.models.DataHelperAPI;
-import ru.netology.models.JSONparts;
+import ru.netology.utils.JSONparts;
 import ru.netology.models.UserAPI;
+import ru.netology.utils.SQLpart;
 
 import java.sql.DriverManager;
 import java.sql.SQLException;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TransferMoneyAPITest {
 
@@ -23,22 +27,22 @@ public class TransferMoneyAPITest {
         JSONparts.jsonPartTransfer(DataHelperAPI.getTransferAPI(), token);
     }
 
+    @Test
+    void shouldCheckBalanceAfterTransfer() throws SQLException {
+        UserAPI user = DataHelperAPI.getUserAPI();
+        JSONparts.jsonPartLogin(user);
+        String token = JSONparts.jsonPartCode(DataHelperAPI.getVerificationCode(user));
+        JSONparts.jsonPartListCard(token);
+        int startBalance = DataHelperAPI.getCurrentBalance(DataHelperAPI.getTransferAPI().getFrom());
+        JSONparts.jsonPartTransfer(DataHelperAPI.getTransferAPI(), token);
+        int expected = startBalance-Integer.parseInt(DataHelperAPI.getTransferAPI().getAmount());
+        int actual = DataHelperAPI.getCurrentBalance(DataHelperAPI.getTransferAPI().getFrom());
+        assertEquals(expected, actual);
+    }
+
     @AfterAll
     public static void delData() throws SQLException {
-        val delSQLtransfer = "DELETE FROM card_transactions;";
-        val delSQLcard = "DELETE FROM cards;";
-        val delSQLcode = "DELETE FROM auth_codes;";
-        val delSQLuser = "DELETE FROM users;";
-        val runner = new QueryRunner();
-        try (
-                val conn = DriverManager.getConnection(
-                        "jdbc:mysql://localhost:3306/app", "app", "pass"
-                );
-        ) {
-            runner.update(conn, delSQLtransfer);
-            runner.update(conn, delSQLcard);
-            runner.update(conn, delSQLcode);
-            runner.update(conn, delSQLuser);
-        }
+        SQLpart.sqlDELETE();
     }
+
 }

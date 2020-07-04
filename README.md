@@ -80,3 +80,8 @@ java -jar app-deadline.jar -P:jdbc.url=jdbc:mysql://localhost:3306/app -P:jdbc.u
 ```
 ./gradlew test -Dselenide.headless=true --info
 ```
+
+В результате тестирования была найдена ошибка приложения при переводе средст с карты на карту:
+
+[ссылка на issues c багом  Не верный баланс на карте после операции перевода](https://github.com/leonnika/aqa-hw8-api/issues/1)
+
